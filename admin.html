@@ -6,14 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; background: #f4f7f9; }
-    h2 { color: #2c3e50; }
-    .login, .dashboard { max-width: 700px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    h2 { color: #2c3e50; margin-top: 30px; }
+    .login, .dashboard { max-width: 900px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    nav button { margin: 5px; padding: 8px 14px; border: none; border-radius: 6px; background: #3498db; color: #fff; cursor: pointer; }
+    nav button.active { background: #2ecc71; }
     table { width: 100%; border-collapse: collapse; margin-top: 15px; }
     table, th, td { border: 1px solid #ccc; }
     th, td { padding: 8px; text-align: left; }
-    button { padding: 6px 12px; margin: 3px; cursor: pointer; border: none; border-radius: 5px; }
-    .edit { background: #3498db; color: white; }
-    .delete { background: #e74c3c; color: white; }
+    button.action { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; }
+    .edit { background: #2980b9; color: #fff; }
+    .delete { background: #c0392b; color: #fff; }
     .add-form { margin-top: 20px; }
     .hidden { display: none; }
   </style>
@@ -21,113 +23,185 @@
 <body>
 
 <div class="login" id="loginBox">
-  <h2>Admin Login</h2>
+  <h2>🔐 Admin Login</h2>
   <input type="password" id="adminPass" placeholder="Enter Password">
   <button onclick="checkLogin()">Login</button>
   <p id="loginMsg" style="color:red;"></p>
 </div>
 
 <div class="dashboard hidden" id="dashboard">
-  <h2>ভর্তি ডেটা ম্যানেজমেন্ট</h2>
-  <table id="dataTable">
-    <thead>
-      <tr>
-        <th>ID</th><th>নাম</th><th>বয়স</th><th>অভিভাবক</th><th>যোগাযোগ</th><th>অবস্থা</th><th>অ্যাকশন</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <h2>📌 Admin Dashboard</h2>
+  <nav>
+    <button onclick="showSection('admission')" class="active">Admission</button>
+    <button onclick="showSection('gallery')">Gallery</button>
+    <button onclick="showSection('testimonial')">Testimonials</button>
+    <button onclick="showSection('ads')">Advertisements</button>
+  </nav>
 
-  <h3>নতুন ডেটা যোগ করুন</h3>
-  <form class="add-form" onsubmit="addData(event)">
-    <input type="text" id="name" placeholder="শিক্ষার্থীর নাম" required>
-    <input type="text" id="age" placeholder="বয়স" required>
-    <input type="text" id="parent" placeholder="অভিভাবকের নাম" required>
-    <input type="text" id="contact" placeholder="ফোন" required>
-    <input type="text" id="status" placeholder="স্ট্যাটাস (Pending/Approved)">
-    <button type="submit">যোগ করুন</button>
-  </form>
+  <!-- Admission Section -->
+  <section id="admission" class="section">
+    <h3>ভর্তি ডেটা ম্যানেজমেন্ট</h3>
+    <table id="dataTable">
+      <thead>
+        <tr><th>ID</th><th>নাম</th><th>বয়স</th><th>অভিভাবক</th><th>যোগাযোগ</th><th>অবস্থা</th><th>অ্যাকশন</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <form class="add-form" onsubmit="addAdmission(event)">
+      <input type="text" id="name" placeholder="শিক্ষার্থীর নাম" required>
+      <input type="text" id="age" placeholder="বয়স" required>
+      <input type="text" id="parent" placeholder="অভিভাবকের নাম" required>
+      <input type="text" id="contact" placeholder="ফোন" required>
+      <input type="text" id="status" placeholder="স্ট্যাটাস (Pending/Approved)">
+      <button type="submit">যোগ করুন</button>
+    </form>
+  </section>
+
+  <!-- Gallery Section -->
+  <section id="gallery" class="section hidden">
+    <h3>📷 Gallery Management</h3>
+    <table id="galleryTable">
+      <thead><tr><th>ID</th><th>Image</th><th>Caption</th><th>অ্যাকশন</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <form class="add-form" onsubmit="addGallery(event)">
+      <input type="text" id="gImage" placeholder="Image URL" required>
+      <input type="text" id="gCaption" placeholder="Caption">
+      <button type="submit">Add Image</button>
+    </form>
+  </section>
+
+  <!-- Testimonial Section -->
+  <section id="testimonial" class="section hidden">
+    <h3>📝 Testimonial Management</h3>
+    <table id="testTable">
+      <thead><tr><th>ID</th><th>Parent</th><th>Comment</th><th>অ্যাকশন</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <form class="add-form" onsubmit="addTestimonial(event)">
+      <input type="text" id="tParent" placeholder="Parent Name" required>
+      <input type="text" id="tComment" placeholder="Comment" required>
+      <button type="submit">Add Testimonial</button>
+    </form>
+  </section>
+
+  <!-- Advertisement Section -->
+  <section id="ads" class="section hidden">
+    <h3>📢 Advertisement Management</h3>
+    <table id="adsTable">
+      <thead><tr><th>ID</th><th>Ad Code / Image</th><th>অ্যাকশন</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <form class="add-form" onsubmit="addAd(event)">
+      <textarea id="adCode" placeholder="Paste Ad Code or Image URL" required></textarea>
+      <button type="submit">Add Ad</button>
+    </form>
+  </section>
 </div>
 
 <script>
-const API_URL = "https://sheetdb.io/api/v1/YOUR_SHEETDB_API"; // এখানে আপনার API দিন
-const ADMIN_PASSWORD = "12345"; // এখানে নিজের পাসওয়ার্ড সেট করুন
+const ADMIN_PASSWORD = "12345"; // নিজের পাসওয়ার্ড দিন
+const SHEETDB = {
+  admission: "https://sheetdb.io/api/v1/YOUR_ADMISSION_API",
+  gallery:   "https://sheetdb.io/api/v1/YOUR_GALLERY_API",
+  testimonial: "https://sheetdb.io/api/v1/YOUR_TEST_API",
+  ads: "https://sheetdb.io/api/v1/YOUR_ADS_API"
+};
 
-function checkLogin() {
-  let pass = document.getElementById("adminPass").value;
-  if(pass === ADMIN_PASSWORD){
+function checkLogin(){
+  if(document.getElementById("adminPass").value === ADMIN_PASSWORD){
     document.getElementById("loginBox").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
-    loadData();
+    loadData("admission");
   } else {
     document.getElementById("loginMsg").innerText = "ভুল পাসওয়ার্ড!";
   }
 }
 
-function loadData(){
-  fetch(API_URL)
-  .then(res => res.json())
-  .then(data => {
-    let rows = "";
-    data.forEach(row => {
-      rows += `
-      <tr>
-        <td>${row.id}</td>
-        <td>${row.name}</td>
-        <td>${row.age}</td>
-        <td>${row.parent_name}</td>
-        <td>${row.contact}</td>
-        <td>${row.admission_status}</td>
-        <td>
-          <button class="edit" onclick="editData('${row.id}')">Edit</button>
-          <button class="delete" onclick="deleteData('${row.id}')">Delete</button>
-        </td>
-      </tr>`;
-    });
-    document.querySelector("#dataTable tbody").innerHTML = rows;
+function showSection(section){
+  document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
+  document.getElementById(section).classList.remove("hidden");
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+  event.target.classList.add("active");
+  loadData(section);
+}
+
+// Generic Data Loader
+function loadData(type){
+  fetch(SHEETDB[type]).then(r=>r.json()).then(data=>{
+    let rows="";
+    if(type==="admission"){
+      data.forEach(d=>rows+=`<tr><td>${d.id}</td><td>${d.name}</td><td>${d.age}</td><td>${d.parent_name}</td><td>${d.contact}</td><td>${d.admission_status}</td>
+        <td><button class="edit" onclick="editStatus('${d.id}')">Edit</button>
+        <button class="delete" onclick="deleteRow('${type}','${d.id}')">Delete</button></td></tr>`);
+      document.querySelector("#dataTable tbody").innerHTML=rows;
+    }
+    if(type==="gallery"){
+      data.forEach(d=>rows+=`<tr><td>${d.id}</td><td><img src="${d.image}" width="80"></td><td>${d.caption}</td>
+        <td><button class="delete" onclick="deleteRow('${type}','${d.id}')">Delete</button></td></tr>`);
+      document.querySelector("#galleryTable tbody").innerHTML=rows;
+    }
+    if(type==="testimonial"){
+      data.forEach(d=>rows+=`<tr><td>${d.id}</td><td>${d.parent}</td><td>${d.comment}</td>
+        <td><button class="delete" onclick="deleteRow('${type}','${d.id}')">Delete</button></td></tr>`);
+      document.querySelector("#testTable tbody").innerHTML=rows;
+    }
+    if(type==="ads"){
+      data.forEach(d=>rows+=`<tr><td>${d.id}</td><td>${d.code}</td>
+        <td><button class="delete" onclick="deleteRow('${type}','${d.id}')">Delete</button></td></tr>`);
+      document.querySelector("#adsTable tbody").innerHTML=rows;
+    }
   });
 }
 
-function addData(e){
+// Admission Add
+function addAdmission(e){
   e.preventDefault();
   let newRow = {
-    name: document.getElementById("name").value,
-    age: document.getElementById("age").value,
-    parent_name: document.getElementById("parent").value,
-    contact: document.getElementById("contact").value,
-    admission_status: document.getElementById("status").value || "Pending"
+    name: name.value, age: age.value, parent_name: parent.value, contact: contact.value, admission_status: status.value||"Pending"
   };
-  fetch(API_URL, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({data:newRow})
-  }).then(res=>res.json()).then(r=>{
-    alert("ডেটা যোগ হয়েছে!");
-    loadData();
-  });
+  fetch(SHEETDB.admission,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({data:newRow})})
+  .then(r=>r.json()).then(()=>{alert("Admission Added!"); loadData("admission");});
 }
 
-function deleteData(id){
-  if(confirm("আপনি কি নিশ্চিত?")){
-    fetch(`${API_URL}/id/${id}`, { method: "DELETE" })
-    .then(res=>res.json()).then(r=>{
-      alert("ডেটা মুছে ফেলা হয়েছে!");
-      loadData();
-    });
+// Gallery Add
+function addGallery(e){
+  e.preventDefault();
+  let newRow = {image: gImage.value, caption: gCaption.value};
+  fetch(SHEETDB.gallery,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({data:newRow})})
+  .then(r=>r.json()).then(()=>{alert("Image Added!"); loadData("gallery");});
+}
+
+// Testimonial Add
+function addTestimonial(e){
+  e.preventDefault();
+  let newRow = {parent: tParent.value, comment: tComment.value};
+  fetch(SHEETDB.testimonial,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({data:newRow})})
+  .then(r=>r.json()).then(()=>{alert("Testimonial Added!"); loadData("testimonial");});
+}
+
+// Ad Add
+function addAd(e){
+  e.preventDefault();
+  let newRow = {code: adCode.value};
+  fetch(SHEETDB.ads,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({data:newRow})})
+  .then(r=>r.json()).then(()=>{alert("Ad Added!"); loadData("ads");});
+}
+
+// Delete Row
+function deleteRow(type,id){
+  if(confirm("Delete this item?")){
+    fetch(`${SHEETDB[type]}/id/${id}`,{method:"DELETE"})
+    .then(r=>r.json()).then(()=>{alert("Deleted!"); loadData(type);});
   }
 }
 
-function editData(id){
-  let newStatus = prompt("নতুন স্ট্যাটাস লিখুন (Pending/Approved):");
+// Edit Admission Status
+function editStatus(id){
+  let newStatus = prompt("Enter new status (Pending/Approved):");
   if(newStatus){
-    fetch(`${API_URL}/id/${id}`, {
-      method: "PATCH",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({data:{admission_status:newStatus}})
-    }).then(res=>res.json()).then(r=>{
-      alert("স্ট্যাটাস আপডেট হয়েছে!");
-      loadData();
-    });
+    fetch(`${SHEETDB.admission}/id/${id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({data:{admission_status:newStatus}})})
+    .then(r=>r.json()).then(()=>{alert("Updated!"); loadData("admission");});
   }
 }
 </script>
