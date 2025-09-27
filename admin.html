@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel - Kindergarten Admission</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f7f9; }
+    h2 { color: #2c3e50; }
+    .login, .dashboard { max-width: 700px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    table, th, td { border: 1px solid #ccc; }
+    th, td { padding: 8px; text-align: left; }
+    button { padding: 6px 12px; margin: 3px; cursor: pointer; border: none; border-radius: 5px; }
+    .edit { background: #3498db; color: white; }
+    .delete { background: #e74c3c; color: white; }
+    .add-form { margin-top: 20px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<div class="login" id="loginBox">
+  <h2>Admin Login</h2>
+  <input type="password" id="adminPass" placeholder="Enter Password">
+  <button onclick="checkLogin()">Login</button>
+  <p id="loginMsg" style="color:red;"></p>
+</div>
+
+<div class="dashboard hidden" id="dashboard">
+  <h2>ভর্তি ডেটা ম্যানেজমেন্ট</h2>
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>ID</th><th>নাম</th><th>বয়স</th><th>অভিভাবক</th><th>যোগাযোগ</th><th>অবস্থা</th><th>অ্যাকশন</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h3>নতুন ডেটা যোগ করুন</h3>
+  <form class="add-form" onsubmit="addData(event)">
+    <input type="text" id="name" placeholder="শিক্ষার্থীর নাম" required>
+    <input type="text" id="age" placeholder="বয়স" required>
+    <input type="text" id="parent" placeholder="অভিভাবকের নাম" required>
+    <input type="text" id="contact" placeholder="ফোন" required>
+    <input type="text" id="status" placeholder="স্ট্যাটাস (Pending/Approved)">
+    <button type="submit">যোগ করুন</button>
+  </form>
+</div>
+
+<script>
+const API_URL = "https://sheetdb.io/api/v1/YOUR_SHEETDB_API"; // এখানে আপনার API দিন
+const ADMIN_PASSWORD = "12345"; // এখানে নিজের পাসওয়ার্ড সেট করুন
+
+function checkLogin() {
+  let pass = document.getElementById("adminPass").value;
+  if(pass === ADMIN_PASSWORD){
+    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
+    loadData();
+  } else {
+    document.getElementById("loginMsg").innerText = "ভুল পাসওয়ার্ড!";
+  }
+}
+
+function loadData(){
+  fetch(API_URL)
+  .then(res => res.json())
+  .then(data => {
+    let rows = "";
+    data.forEach(row => {
+      rows += `
+      <tr>
+        <td>${row.id}</td>
+        <td>${row.name}</td>
+        <td>${row.age}</td>
+        <td>${row.parent_name}</td>
+        <td>${row.contact}</td>
+        <td>${row.admission_status}</td>
+        <td>
+          <button class="edit" onclick="editData('${row.id}')">Edit</button>
+          <button class="delete" onclick="deleteData('${row.id}')">Delete</button>
+        </td>
+      </tr>`;
+    });
+    document.querySelector("#dataTable tbody").innerHTML = rows;
+  });
+}
+
+function addData(e){
+  e.preventDefault();
+  let newRow = {
+    name: document.getElementById("name").value,
+    age: document.getElementById("age").value,
+    parent_name: document.getElementById("parent").value,
+    contact: document.getElementById("contact").value,
+    admission_status: document.getElementById("status").value || "Pending"
+  };
+  fetch(API_URL, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({data:newRow})
+  }).then(res=>res.json()).then(r=>{
+    alert("ডেটা যোগ হয়েছে!");
+    loadData();
+  });
+}
+
+function deleteData(id){
+  if(confirm("আপনি কি নিশ্চিত?")){
+    fetch(`${API_URL}/id/${id}`, { method: "DELETE" })
+    .then(res=>res.json()).then(r=>{
+      alert("ডেটা মুছে ফেলা হয়েছে!");
+      loadData();
+    });
+  }
+}
+
+function editData(id){
+  let newStatus = prompt("নতুন স্ট্যাটাস লিখুন (Pending/Approved):");
+  if(newStatus){
+    fetch(`${API_URL}/id/${id}`, {
+      method: "PATCH",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({data:{admission_status:newStatus}})
+    }).then(res=>res.json()).then(r=>{
+      alert("স্ট্যাটাস আপডেট হয়েছে!");
+      loadData();
+    });
+  }
+}
+</script>
+
+</body>
+</html>
